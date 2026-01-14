@@ -4150,17 +4150,17 @@ ath="-162.0902" atv="22.3907"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5)
 
 		<hotspot name="hsp_51_50"
  style="hs_anim"
- url="Animated/ani51.png"
- animurl="Animated/ani51.png"
-ath="-101.2238" atv="21.0214"	 onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
- onloaded="hs_play(hsp_49_51);" />
+ url="Animated/ani50.png"
+ animurl="Animated/ani50.png"
+ath="-101.2238" atv="21.0214"	 onclick="loadscene(scene_50,null,MERGE,BLEND(0.5));"
+ onloaded="hs_play(hsp_51_50);" />
 
 		<hotspot name="hsp_52_51"
  style="hs_anim"
  url="Animated/ani51.png"
  animurl="Animated/ani51.png"
 ath="-57.5320" atv="26.7460"	 onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
- onloaded="hs_play(hsp_49_51);" />
+ onloaded="hs_play(hsp_52_51);" />
 
 		<hotspot name="hsp_57_56"
  style="hs_anim"
@@ -4384,12 +4384,6 @@ ath="174.0811" atv="35.8367"  onclick="loadscene(scene_52,null,MERGE,BLEND(0.5))
  onloaded="hs_play(hsp_57_47);" />
 
 
-		<hotspot name="hsp_57_5"
- style="hs_anim"
- url="Animated/ani5.png"
- animurl="Animated/ani5.png"
-ath="-129.8025" atv="13.6556" onclick="loadscene(scene_5_DSC06606_Panorama,null,MERGE,BLEND(0.5));"
- onloaded="hs_play(hsp_57_5);" />
 
 
 		<hotspot name="hs_gallery_54_1"
