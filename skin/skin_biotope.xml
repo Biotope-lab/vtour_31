@@ -1,0 +1,36 @@
+<krpano>
+
+	<!-- 1) 배경 글라스 제거 -->
+	<skin_settings
+	  design_bgalpha="0.0"
+	  design_bgborder="0 0xFFFFFF 0.0"
+	  design_bgroundedge="0"
+	  design_bgshadow="0"
+  />
+
+	<!-- 2) 방향 버튼 제거 -->
+	<layer name="skin_btn_up"    visible="false" enabled="false" />
+	<layer name="skin_btn_down"  visible="false" enabled="false" />
+	<layer name="skin_btn_left"  visible="false" enabled="false" />
+	<layer name="skin_btn_right" visible="false" enabled="false" />
+
+
+
+
+
+	<!-- ✅ (중요) 컨트롤바 "안" 가운데에 새 메뉴 이미지 버튼 추가 -->
+	<layer name="webvr"
+		   parent="skin_control_bar_buttons"
+		   url="vtourskin_menu.png"
+		   width="104" height="104"
+		   scale="0.30"
+		   align="center"
+		   edge="center"
+		   x="0" y="0"
+		   zorder="999"
+		   visible="true"
+		   alpha="1"
+		   enabled="true"
+		   handcursor="true"></layer>
+
+</krpano>
