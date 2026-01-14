@@ -1340,6 +1340,219 @@ Apron used for blaudruck (blueprint) work
 
 
 
+	<data name="cap_g40_1">
+		<![CDATA[
+<b>다양한 패턴을 보여주는 천 Mustertuch Sampler printed with blueprint patterns </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
+]]>
+	</data>
+
+	<data name="cap_g40_2">
+		<![CDATA[
+<b>패턴 모음집 Mustertuch · Pattern Book </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 후반 <br><br>
+
+패턴의 견본을 모아둔 책이다. 블라우드루크 천을 주문할 때 원하는 무늬를 고를 수 있도록 다양한 패턴조각이 붙어있다.
+]]>
+	</data>
+
+		<data name="cap_g40_3">
+		<![CDATA[
+<b>아라비아검 Gummiarabicum · Gum Arabic </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 후반 <br><br>
+
+방염풀을 만들 때 사용하는 재료이다. 직물에 염색이 되지 않게 막아주는 역할을 하기 때문에 방염에서 가장 중요한 재료 중 하나이다.
+]]>
+	</data>
+
+
+		<data name="cap_g40_4">
+		<![CDATA[
+<b>방염풀 냄비  Papp-Pfanne aus Kupfer mit Papprückständen</br>
+Pot used for dye-resist paste (Papp) </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 후반 <br><br>
+
+방염풀을 만들기 위해 재료를 넣고 섞을 때 사용하는 냄비이다. 냄비 안에는 방염풀의 잔여물이 묻어 있다
+]]>
+	</data>
+
+
+		<data name="cap_g40_5">
+		<![CDATA[
+<b>방염풀을 바르는 솔  Bartwisch (Papp Brush) </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
+
+샤시에 방염풀을 넓게 펴바르는 솔이다. 솔의 이름인 '바르트비쉬'는 '수염처럼 생긴 솔'이라는 뜻을 가지고 있다.
+]]>
+	</data>
+
+		<data name="cap_g41_1">
+		<![CDATA[
+<b>방염풀을 고르게 펴는 판 BChassis </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
+
+방염풀을 고르고 넓게 펴는 판으로 '샤시'라고 부른다. 먼저 방염풀을 덜어 판 위에 올리고 솔로 넓게 펴 바른다. 그리고 패턴 블록을 판에 찍어 방염풀을 묻혀낸다.
+]]>
+	</data>	
+
+			<data name="cap_g41_2">
+		<![CDATA[
+<b>블록을 두드리는 망치 Färberhammer Dyer's Hammer </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
+
+패턴 블록을 직물에 찍기 위해 사용하는 도구로 '패르버해머'라고 부른다. 패턴 블록은 방염풀을 바른 후 직물에 눌러 패턴을 찍어내는데, 이때 망치를 사용해 블록을 두드리면 편리하고 고르게 찍을 수 있다.
+]]>
+	</data>	
+
+			<data name="cap_g42_1">
+		<![CDATA[
+<b>방염풀로 패턴을 찍은 직물과 방염· 마친 직물 <br>
+Mustertücher bedruckt mit „Papp“ und fertig mit Blaudruckmudster <br>
+Fabric with dye-resist paste-printed patterns and Finished fabric after dyeing and resist block printing
+</b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 20세기 초반 <br><br>
+
+방염풀로 패턴만 찍은 직물과 방염 후 염색하여 완성한 직물이다. 방염풀은 연두색 혹은 연한 갈색을 띤다. 방염을 하고 푸른색으로 염색을 한 후에 산성 성분의 물이나 뜨거운 물로 세탁하면 직물에 묻어있는 방염풀이 제거된다.]]>
+	</data>	
+
+
+			<data name="cap_g42_2">
+		<![CDATA[
+<b> 인디고 염료  Indigo“ zur Farberzeugung Indigo Dye </b><br>
+구타우염색박물관 (Färbermuseum Gutau) <br><br>
+
+푸른색으로 염색할 때 사용하는 염료로, 블라우드루크에서 가장 중요한 재료이다. 습기를 머금으면 쉽게 뭉쳐지며, 덩어리 형태로는 물에 잘 풀어지지 않기 때문에 염액에 넣을 때는 가루 형태로 빻아서 사용한다	
+]]>
+</data>	
+
+
+				<data name="cap_g42_3">
+		<![CDATA[
+<b>절구와 절굿공이 Mörser mit Stößel Mortar and Pestle </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 20세기 초반 <br><br>
+
+인디고 염료를 가루 형태로 빻을 때 사용하는 절구와 절굿공이다. 인디고 염료는 습기를 머금으면 쉽게 뭉쳐지고 물에 잘 풀어지지 않기 때문에 염액을 만들기 전에 인디고 염료를 곱게 빻아서 사용한다.
+]]>	</data>	
+
+				<data name="cap_g43_1">
+		<![CDATA[
+<b>직물 틀 Sternreifen Star Tire (to hang fabric) </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 20세기 중반 <br><br>
+
+별이 달린 둥근 띠라는 뜻을 가진 '슈테른라이펜'은 직물을 염액 통(퀴페, Küpe)에 넣을 때 사용하는 틀이다. 방염풀을 찍은 직물을 틀에 걸어 팽팽하게 펴고 염액이 담겨 있는 통에 직물을 담갔다가 꺼낸다. 도르래가 달려있어 쉽게 내리거나 올릴 수 있다.
+]]>	</data>	
+
+				<data name="cap_g47_1">
+		<![CDATA[
+<b>디른들 SDirndl Dirndl (Austrian traditional dress) </b><br>
+구타우염색박물관 (Färbermuseum Gutau) · 20세기 초반 <br><br>
+
+오스트리아, 독일, 스위스 등의 국가에서 여성들이 입는 전통의상이다. 블라우스, 원피스(혹은 조끼와 치마), 앞치마로 구성되어 있다. 이 의상은 블라우드루크 직물로 만들어진 디른들 원피스이다.
+]]>	</data>	
+
+
+				<data name="cap_g48_1">
+		<![CDATA[
+<b>염색 커튼 Indigo-gefärbte Vorhänge Indigo Dyed Curtains </b><br>
+구타우염색박물관 (Färbermuseum Gutau) <br><br>
+
+블라우드루크 천으로 만들어진 커튼이다. 블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
+]]>	</data>	
+
+				<data name="cap_g48_2">
+		<![CDATA[
+<b>염색 이불 Indigo-gefärbte Decke Indigo Dyed Blanket</b><br>
+구타우염색박물관 (Färbermuseum Gutau) <br><br>
+
+블라우드루크 천으로 만들어진 이불이다. 블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
+]]>	</data>	
+
+				<data name="cap_g48_3">
+		<![CDATA[
+<b>염색 베개 Kissenbezug (indigogefärbt) Indigo-dyed Pillow </b><br>
+구타우염색박물관 (Färbermuseum Gutau) <br><br>
+
+블라우드루크 천으로 만들어진 베개이다.  블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
+]]>	</data>	
+
+
+				<data name="cap_g50_1">
+		<![CDATA[
+<b>구타우와 블라우드루크 소개 리플릿 Broschüre über Gutau und Blaudruck <br>
+Leaflet on Gutau and Blaudruck </b><br>
+
+오스트리아의 블라우드루크를 소개하는 리플릿이다. 블라우드루크, 인디고 식물, 쪽빛 염색과 더불어 구타 우염색박물관과 염색시장에 대해 소개하고 있다.
+]]>	</data>	
+
+				<data name="cap_g50_2">
+		<![CDATA[
+<b>구타우염색박물관 리플릿 Broschüre zum Färbermuseum Gutau <br>
+Leaflet on Färbermuseum Gutau (Gutau Dyers' Museum) </b><br>
+
+오스트리아 구타우의 염색박물관을 소개한 영문 리플릿이다. 구타우염색박물관은 지역 박물관을 넘어서 오스트리아의 블라우드루크를 소개하는 대표적인 박물관이다.
+]]>	</data>	
+
+				<data name="cap_g50_3">
+		<![CDATA[
+<b>섬유 공예 작품 모음집 Heimatbuch Collection of Textile Crafts </b><br>
+초익 염색 공방 (Zeugfärberei) · 복제 Replica · 2024 · Miso Kim 외 44명  <br><br>
+
+구타우염색박물관 소속의 초익 공방에서 제작한 작품집이다. 블라우드루크, 직조, 자수 등 다양한 직물 기법을 사용하여 만든 작품을 모아 펴냈다.]]>
+</data>	
+
+				<data name="cap_g52_1">
+		<![CDATA[
+<b>구타우 염색시장 패션쇼 의상 Kleidung Clothes<br>
+고트프리드 꾸뛰르 린츠 (Gottfried Couture Linz) · 2006 <br><br>
+
+구타우 염색시장의 패션쇼에 올라갔던 의상이다. 구타우 염색시장은 매년 5월 첫째주 일요일에 열리며 유럽의 염색장인들이 운영하는 부스와 더불어 패션쇼, 공연 등 다양한 행사를 선보인다.
+]]>
+</data>	
+
+
+				<data name="cap_g53_1">
+		<![CDATA[
+<b>내 손에 행복이 Happiness in my hand </b><br>
+국립무형유산원' 창의공방' 결과물 · 2019 · 누비장 이수자 최재희 <br><br>
+]]>
+</data>	
+				<data name="cap_g53_2">
+		<![CDATA[
+<b>달(비움, 채움의 시간) Moon - Time for Emptying and Filling <br>
+국립무형유산원' 창의공방' 결과물 · 2020 · 누비장 이수자 김은주 <br><br>
+
+]]>
+</data>	
+
+				<data name="cap_g54_1">
+		<![CDATA[
+<b>늘어난 시간080404 Extended Time 08040 </b><br>
+국립무형유산원' 창의공방' 결과물 · 2020 · 누비장 이수자 김은주 <br><br>
+
+]]>
+
+
+</data>	
+
+				<data name="cap_g55_1">
+		<![CDATA[
+<b>인디고 컬럼 indigo Columns</b><br>
+국립무형유산원' 창의공방' 결과물 · 2022 · 염색장 이수자 정찬희 <br><br>
+
+]]>
+
+
+</data>	
+
+				<data name="cap_g56_1">
+		<![CDATA[
+<b>조선의 밤 미래를 열다 Joseon's night opens the future</b><br>
+국립무형유산원' 창의공방' 결과물 · 2019 · 염색장 이수자 윤영숙 <br><br>
+
+]]>
+
+
+</data>	
 
 	<!-- *** add hotspt *** -->
 
@@ -4296,13 +4509,6 @@ ath="-117.1891" atv="43.7015" onclick="loadscene(scene_56,null,MERGE,BLEND(0.5))
 
 
 
-
-		<hotspot name="hsp_57_5"
- style="hs_anim"
- url="Animated/ani5.png"
- animurl="Animated/ani5.png"
-ath="-59.8485" atv="16.8602" onclick="loadscene(scene_5_DSC06606_Panorama,null,MERGE,BLEND(0.5));"
- onloaded="hs_play(hsp_57_5);" />
 
 		<hotspot name="hsp_57_55"
  style="hs_anim"
