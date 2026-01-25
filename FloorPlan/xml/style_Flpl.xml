@@ -24,7 +24,7 @@
 <!-- ////////////////////////     radar   ////////////////////////////  -->
 	
 		<!-- ТОЧКА С РАДАРОМ   -->	
-	<layer name="activpitflpl" keep="true" type="image" align="center"  width="20" scale="0.7" height="prop" enabled="false" autoalpha="true" zorder="32" alpha="0"  url="calc: plan_settings.url_plan + 'iconPoint/' + plan_settings.point_url_3" >
+	<layer name="activpitflpl" keep="true" type="image" align="center"  scale="0.6" width="20" height="prop" enabled="false" autoalpha="true" zorder="32" alpha="0"  url="calc: plan_settings.url_plan + 'iconPoint/' + plan_settings.point_url_3" >
 			  
 		<!-- radar   -->
 		<plugin name="radarEFR" url.html5="%FIRSTXML%/plugins/radar.js" align="center" edge="center" zorder="51" x="0" y="0" 
@@ -348,5 +348,3 @@
 	
 	
 </krpano>
-
-

@@ -12,7 +12,7 @@
 	               maps_loadonfirstuse="true"
 	               gyro="false"
 	               gyro_keeplookingdirection="false"
-	               webvr="true"
+	               webvr="false"
 	               webvr_keeplookingdirection="true"
 	               webvr_prev_next_hotspots="false"
 	               autotour="false"
@@ -410,29 +410,23 @@
 						   align="center" x="0" y="0" width="800" height="32">
 
 						<layer name="skin_btn_prev"   style="skin_base|skin_glow" crop="0|64|64|64"
-							   align="center" x="-140" y="0" scale="0.5" alpha="0.5"
+							   align="center" x="-155" y="0" scale="0.5" alpha="0.5"
 							   onclick="if(skin_settings.thumbs_loop, skin_nextscene_loop(-1), skin_nextscene(-1));" />
 
 						<layer name="skin_btn_thumbs"    style="skin_base|skin_glow" crop="0|128|64|64"  
-							   align="center"        x="-200"   y="0"  scale="0.5" 
+							   parent="" align="lefttop"        x="0"   y="0"  scale="0.5" 
 							   ondown="skin_showmap(false); skin_showthumbs();" />
 
-
 						<layer name="skin_btn_in"     style="skin_base|skin_glow" crop="0|320|64|64"
-							   align="center" x=" -40" y="0" scale="0.5"
+							   align="center" x=" -30" y="0" scale="0.5"
 							   ondown="set(fov_moveforce,-1);" onup="set(fov_moveforce,0);" />
 
 						<layer name="skin_btn_out"    style="skin_base|skin_glow" crop="64|320|64|64"
-							   align="center" x="+45" y="0" scale="0.5"
+							   align="center" x="+30" y="0" scale="0.5"
 							   ondown="set(fov_moveforce,+1);" onup="set(fov_moveforce,0);" />
 
-						<layer name="skin_btn_vr"  url="vtourskin_menu.png"
-							   align="center" x="+50" y="0"
-							   width="104" height="104" scale="0.30"
-							   handcursor="true" enabled="true" onclick="" />
-
 						<layer name="skin_btn_fs"     style="skin_base|skin_glow" crop="0|576|64|64"
-							   align="center" x="-200" y="0" scale="0.5"
+							   align="righttop" x="-150" y="0" scale="0.5"
 							   onclick="switch(fullscreen);" devices="fullscreensupport" />
 
 						<!-- 	<layer name="skin_btn_hide"   style="skin_base|skin_glow" crop="0|448|64|64"
@@ -440,10 +434,8 @@
 							   onclick="skin_hideskin()" /> -->
 
 						<layer name="skin_btn_next"   style="skin_base|skin_glow" crop="64|64|64|64"
-							   align="center" x="+140 " y="0" scale="0.5" alpha="0.5"
+							   align="center" x="+155 " y="0" scale="0.5" alpha="0.5"
 							   onclick="if(skin_settings.thumbs_loop, skin_nextscene_loop(+1), skin_nextscene(+1));" />
-
-				
 						
 					</layer>
 

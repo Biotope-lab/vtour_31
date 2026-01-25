@@ -18,19 +18,5 @@
 
 
 
-	<!-- ✅ (중요) 컨트롤바 "안" 가운데에 새 메뉴 이미지 버튼 추가 -->
-	<layer name="webvr"
-		   parent="skin_control_bar_buttons"
-		   url="vtourskin_menu.png"
-		   width="104" height="104"
-		   scale="0.30"
-		   align="center"
-		   edge="center"
-		   x="0" y="0"
-		   zorder="999"
-		   visible="true"
-		   alpha="1"
-		   enabled="true"
-		   handcursor="true"></layer>
 
 </krpano>
