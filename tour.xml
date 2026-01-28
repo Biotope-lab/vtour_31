@@ -518,6 +518,7 @@
         if(hotspot[hsp_2_video], hotspot[hsp_2_video].stop(); );
         if(hotspot[hsp_11_video], hotspot[hsp_11_video].stop(); );
         if(hotspot[hsp_30_video], hotspot[hsp_30_video].stop(); );
+        if(hotspot[hsp_37_video], hotspot[hsp_37_video].stop(); );
         if(hotspot[hsp_41_video], hotspot[hsp_41_video].stop(); );
         if(hotspot[hsp_45_video], hotspot[hsp_45_video].stop(); );
         if(hotspot[hsp_50_video], hotspot[hsp_50_video].stop(); );
@@ -1963,7 +1964,7 @@ Apron used for blaudruck (blueprint) work
 
 	</scene>
 
-	<scene name="scene_37" title="43_DSC07307 Panorama" onstart="" thumburl="panos/43_DSC07307_Panorama.tiles/thumb.jpg" lat="" lng="" alt="" heading="">
+	<scene name="scene_37" title="43_DSC07307 Panorama" onstart="if(hotspot[hsp_37_video], hotspot[hsp_37_video].play(); );" thumburl="panos/43_DSC07307_Panorama.tiles/thumb.jpg" lat="" lng="" alt="" heading="">
 		
 		<control bouncinglimits="calc:image.cube ? true : false" />
 
@@ -2002,69 +2003,69 @@ Apron used for blaudruck (blueprint) work
 		onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_38);" />
 
-				<hotspot name="hsp_38_39"
+				<hotspot name="hsp_37_39"
 		style="hs_anim"
 		url="Animated/ani39.png"
 		animurl="Animated/ani39.png"
 		ath="83.2774" atv="34.8629"   distorted="false"
 		onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_39);" />
+		onloaded="hs_play(hsp_37_39);" />
 
-				<hotspot name="hsp_38_40"
+				<hotspot name="hsp_37_40"
 		style="hs_anim"
 		url="Animated/ani40.png"
 		animurl="Animated/ani40.png"
 		ath="114.1666" atv="29.5576" 	 distorted="false"
 		onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_40);" />
+		onloaded="hs_play(hsp_37_40);" />
 
-				<hotspot name="hsp_38_41"
+				<hotspot name="hsp_37_41"
 		style="hs_anim"
 		url="Animated/ani41.png"
 		animurl="Animated/ani41.png"
 		ath="157.6547" atv="29.3780"	 distorted="false"
 		onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_41);" />
+		onloaded="hs_play(hsp_37_41);" />
 
-				<hotspot name="hsp_38_42"
+				<hotspot name="hsp_37_42"
 		style="hs_anim"
 		url="Animated/ani42.png"
 		animurl="Animated/ani42.png"
 		ath="-177.4493" atv="21.6706" 	 distorted="false"
 		onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_42);" />
+		onloaded="hs_play(hsp_37_42);" />
 
-				<hotspot name="hsp_38_43"
+				<hotspot name="hsp_37_43"
 		style="hs_anim"
 		url="Animated/ani43.png"
 		animurl="Animated/ani43.png"
 		ath="-166.4140" atv="9.4089"	 distorted="false"
 		onclick="loadscene(scene_43,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_43);" />
+		onloaded="hs_play(hsp_37_43);" />
 
-				<hotspot name="hsp_38_44"
+				<hotspot name="hsp_37_44"
 		style="hs_anim"
 		url="Animated/ani44.png"
 		animurl="Animated/ani44.png"
 		ath="-152.2984" atv="9.7293"  distorted="false"
 		onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_44);" />
+		onloaded="hs_play(hsp_37_44);" />
 
-				<hotspot name="hsp_38_47"
+				<hotspot name="hsp_37_47"
 		style="hs_anim"
 		url="Animated/ani47.png"
 		animurl="Animated/ani47.png"
 		ath="-139.3470" atv="8.6397"	 distorted="false"
 		onclick="loadscene(scene_47,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_47);" />
+		onloaded="hs_play(hsp_37_47);" />
 
-				<hotspot name="hsp_38_51"
+				<hotspot name="hsp_37_51"
 		style="hs_anim"
 		url="Animated/ani51.png"
 		animurl="Animated/ani51.png"
 		ath="-142.6408" atv="-0.0451" 	 distorted="false"
 			onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
-		onloaded="hs_play(hsp_38_51);" />
+		onloaded="hs_play(hsp_37_51);" />
 
 						<!-- article  -->
 
@@ -2076,6 +2077,8 @@ Apron used for blaudruck (blueprint) work
 				distorted="false"
 				onclick="show_text_from_data(txt_hs_article_37_title, txt_hs_article_37_body);"
 							/>
+
+		<hotspot name="hsp_37_video" style="vid_hs_addhs" scalez="1.850" scale="1.85" ath="-94.6879" atv="0.8992" tx="146.6000" ty="2.4000" tz="-118.0000"  videourl="%FIRSTXML%/add_hotspot/video/37_video.mp4" info_ah="37_video.mp4" loop="true" play_vh="true" drag_hs="false"  pausedonstart="false" />
 
 	</scene>
 
