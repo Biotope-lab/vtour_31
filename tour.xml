@@ -153,11 +153,13 @@
 			asyncloop(pressed,
 				calc(y, drag_currenty + (mouse.stagey - drag_stagey));
 				clamp(y, get(y_min), 0);
-			);
+			update_info_scrollbar(); );
 		);
 	</action>
 
 <action name="show_text_from_data">
+	close_gallery();
+	
     set(layer[info_panel].visible, true);
     set(layer[info_panel].enabled, true); set(layer[info_panel].alpha, 1.0);
 
@@ -166,12 +168,12 @@
 
     set(layer[info_panel_text].y, 0);
 
-    delayedcall(0.2, 
-        layer[info_panel_title].update();
-        layer[info_panel_text].update();
-        calc(layer[info_panel_mask].y, layer[info_panel_title].y + layer[info_panel_title].pixelheight + 30);
-        calc(layer[info_panel_mask].height, -30 - get(layer[info_panel_mask].y));
-    );
+delayedcall(0.2, 
+    layer[info_panel_title].update();
+    layer[info_panel_text].update();
+    calc(layer[info_panel_mask].y, layer[info_panel_title].y + layer[info_panel_title].pixelheight + 30);
+    calc(layer[info_panel_mask].height, -30 - get(layer[info_panel_mask].y));
+    update_info_scrollbar(); );
 </action>
 
 <layer name="info_panel" type="container" keep="true" visible="false" enabled="true" align="righttop" 
@@ -189,11 +191,15 @@
     <layer name="info_panel_mask" type="container" align="lefttop" x="24" y="200" 
 	width="452" height="700" maskchildren="true" bgcolor="0x000000" bgalpha="0.0" capture="false">
 
-    <layer name="info_panel_text" type="text" align="lefttop" x="0" y="0" width="100%"
+	<layer name="info_scroll_track" type="container" align="righttop" x="5" y="0" width="4" height="100%" bgcolor="0x000000" bgalpha="0.1" zorder="10" />
+
+    <layer name="info_scroll_bar" type="container" align="righttop" x="5" y="0" width="4" height="50" bgcolor="0x666666" bgalpha="0.8" zorder="11" visible="false" />
+
+    <layer name="info_panel_text" type="text" align="lefttop" x="0" y="0" width="-20"
 	autoheight="true" html="true" enabled="true" background="false" capture="true"
 	css="font-family:Arial; font-size:18px; color:#333; line-height:1.6;"
 	ondown="drag_info_text();"
-    onmousewheel="calc(y, y + (wheeldelta * 40)); calc(y_min, layer[get(parent)].pixelheight - pixelheight); clamp(y, get(y_min), 0);" />
+    onmousewheel="calc(y, y + (wheeldelta * 40)); calc(y_min, layer[get(parent)].pixelheight - pixelheight); clamp(y, get(y_min), 0); update_info_scrollbar();" />
     </layer>
 </layer>
 
@@ -204,11 +210,32 @@
     stoptween(layer[info_panel].alpha);
 </action>
 
+<action name="update_info_scrollbar">
+	calc(text_h, layer[info_panel_text].pixelheight);
+    calc(mask_h, layer[info_panel_mask].pixelheight);
+    
+    if(text_h GT mask_h,
+        set(layer[info_scroll_bar].visible, true);
+        set(layer[info_scroll_track].visible, true);
+        
+        calc(layer[info_scroll_bar].height, (mask_h / text_h) * mask_h);
+        
+        calc(scroll_range, text_h - mask_h);
+        calc(bar_range, mask_h - layer[info_scroll_bar].height);
+        calc(layer[info_scroll_bar].y, (layer[info_panel_text].y / (scroll_range * -1)) * bar_range);
+    ,
+        set(layer[info_scroll_bar].visible, false);
+        set(layer[info_scroll_track].visible, false);
+    );
+</action>
+
 
 	<!-- =========================
 	GALLERY POPUP (GLOBAL)
 ========================= -->
 	<action name="open_gallery">
+		close_all_articles();
+
 		<!-- 사용법: open_gallery(count, img1, img2, img3, img4, img5, img6, img7) -->
 		set(gallery.count,%1);
 
@@ -220,6 +247,13 @@
 		if(%1 GE 6, set(gallery.img6,%7); );
 		if(%1 GE 7, set(gallery.img7,%8); );
 		if(%1 GE 8, set(gallery.img8,%9); );
+		if(%1 GE 9, set(gallery.img9,%10); );
+		if(%1 GE 10, set(gallery.img10,%11); );
+		if(%1 GE 11, set(gallery.img11,%12); );
+		if(%1 GE 12, set(gallery.img12,%13); );
+		if(%1 GE 13, set(gallery.img13,%14); );
+		if(%1 GE 14, set(gallery.img14,%15); );
+		if(%1 GE 15, set(gallery.img15,%16); );
 
 		set(gallery.index,1);
 
@@ -256,7 +290,7 @@
         asyncloop(pressed,
             calc(y, drag_currenty + (mouse.stagey - drag_stagey));
             clamp(y, get(y_min), 0);
-        );
+        update_gallery_scrollbar(););
     );
 </action>
 
@@ -275,6 +309,7 @@
     if(gallery.index == 12, set(layer[gallery_img].url, get(gallery.img12)); );
     if(gallery.index == 13, set(layer[gallery_img].url, get(gallery.img13)); );
     if(gallery.index == 14, set(layer[gallery_img].url, get(gallery.img14)); );
+    if(gallery.index == 15, set(layer[gallery_img].url, get(gallery.img15)); );
 
     set(layer[gallery_caption].y, 0);
     
@@ -333,6 +368,7 @@
 		set(gallery.cap12, %12);
 		set(gallery.cap13, %13);
 		set(gallery.cap14, %14);
+		set(gallery.cap14, %15);
 	</action>
 
 	<!-- show_text_from_data 방식처럼 "data[]의 content"를 직접 읽어서 출력 -->
@@ -373,6 +409,11 @@
 		if(gallery.index == 12,
 		if(gallery.cap12, set(layer[gallery_caption].html, get(data[get(gallery.cap12)].content)); , set(layer[gallery_caption].html,''); );
 		);
+
+set(layer[gallery_caption].y, 0);
+delayedcall(0.1, 
+    layer[gallery_caption].update(); 
+    update_gallery_scrollbar(); );
 	</action>
 
 	<layer name="gallery_bg"
@@ -478,10 +519,14 @@
            type="container" align="lefttop" x="20" y="15" 
            width="-40" height="-30" maskchildren="true" bgalpha="0.0" capture="false">
 
+		   <layer name="gallery_scroll_track" type="container" align="righttop" x="0" y="0" width="3" height="100%" bgcolor="0xffffff" bgalpha="0.1" zorder="10" />
+
+    <layer name="gallery_scroll_bar" type="container" align="righttop" x="0" y="0" width="3" height="50" bgcolor="0xffffff" bgalpha="0.6" zorder="11" visible="false" />
+
         <layer name="gallery_caption"
                type="text"
                align="top" x="0" y="0"
-               width="100%"
+               width="-25"
                autoheight="true"
                html="true"
                wordwrap="true"
@@ -491,8 +536,8 @@
                capture="true"
                enabled="true"
                ondown="drag_gallery_text();"
-               onmousewheel="calc(y, y + (wheeldelta * 40)); calc(y_min, layer[get(parent)].pixelheight - pixelheight); if(y_min LT 0, clamp(y, get(y_min), 0), set(y,0));" />
-    </layer>
+				onmousewheel="calc(y, y + (wheeldelta * 40)); calc(y_min, layer[get(parent)].pixelheight - pixelheight); if(y_min LT 0, clamp(y, get(y_min), 0), set(y,0)); update_gallery_scrollbar();" />    
+			</layer>
 </layer>
 
 
@@ -509,6 +554,24 @@
 		set(layer[gallery_caption].html, '');
 	</action>
 	
+	<action name="update_gallery_scrollbar">
+	calc(text_h, layer[gallery_caption].pixelheight);
+    calc(mask_h, layer[gallery_caption_mask].pixelheight);
+    
+    if(text_h GT mask_h,
+        set(layer[gallery_scroll_bar].visible, true);
+        set(layer[gallery_scroll_track].visible, true);
+        
+        calc(layer[gallery_scroll_bar].height, (mask_h / text_h) * mask_h);
+        
+        calc(scroll_range, text_h - mask_h);
+        calc(bar_range, mask_h - layer[gallery_scroll_bar].height);
+        calc(layer[gallery_scroll_bar].y, (layer[gallery_caption].y / (scroll_range * -1)) * bar_range);
+    ,
+        set(layer[gallery_scroll_bar].visible, false);
+        set(layer[gallery_scroll_track].visible, false);
+    );
+</action>
 	
 <events name="main_events" keep="true"
     onnewscene="
@@ -1441,7 +1504,7 @@ Apron used for blaudruck (blueprint) work
 		<data name="cap_g40_3">
 		<![CDATA[
 <b>아라비아검 ｜ Gummiarabicum ｜ Gum Arabic </b><br>
-구타우염색박물관 (Färbermuseum Gutau) · 19세기 후반 <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 2010 <br><br>
 
 방염풀을 만들 때 사용하는 재료이다. 직물에 염색이 되지 않게 막아주는 역할을 하기 때문에 방염에서 가장 중요한 재료 중 하나이다.
 ]]>
@@ -1460,7 +1523,7 @@ Apron used for blaudruck (blueprint) work
 
 		<data name="cap_g40_5">
 		<![CDATA[
-<b>방염풀을 바르는 솔 ｜ Bartwisch ｜ Bartwisch (Papp Brush) </b><br>
+<b>방염풀을 바르는 솔 ｜ Bartwisch ｜ Papp Brush </b><br>
 구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
 
 샤시에 방염풀을 넓게 펴바르는 솔이다. 솔의 이름인 '바르트비쉬'는 '수염처럼 생긴 솔'이라는 뜻을 가지고 있다.
@@ -1508,7 +1571,7 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g42_3">
 		<![CDATA[
 <b>절구와 절굿공이 ｜ Mörser mit Stößel ｜ Mortar and Pestle </b><br>
-구타우염색박물관 (Färbermuseum Gutau) · 20세기 초반 <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 1877 <br><br>
 
 인디고 염료를 가루 형태로 빻을 때 사용하는 절구와 절굿공이다. 인디고 염료는 습기를 머금으면 쉽게 뭉쳐지고 물에 잘 풀어지지 않기 때문에 염액을 만들기 전에 인디고 염료를 곱게 빻아서 사용한다.
 ]]>	</data>	
@@ -1516,14 +1579,14 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g43_1">
 		<![CDATA[
 <b>직물 틀 ｜ Sternreifen ｜ Star Tire (to hang fabric) </b><br>
-구타우염색박물관 (Färbermuseum Gutau) · 20세기 중반 <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 19세기 중반 <br><br>
 
 별이 달린 둥근 띠라는 뜻을 가진 '슈테른라이펜'은 직물을 염액 통(퀴페, Küpe)에 넣을 때 사용하는 틀이다. 방염풀을 찍은 직물을 틀에 걸어 팽팽하게 펴고 염액이 담겨 있는 통에 직물을 담갔다가 꺼낸다. 도르래가 달려있어 쉽게 내리거나 올릴 수 있다.
 ]]>	</data>	
 
 				<data name="cap_g47_1">
 		<![CDATA[
-<b>디른들 ｜ Dirndl ｜ Dirndl (Austrian traditional dress) </b><br>
+<b>디른들 ｜ Dirndl ｜ Austrian traditional dress </b><br>
 구타우염색박물관 (Färbermuseum Gutau) · 20세기 초반 <br><br>
 
 오스트리아, 독일, 스위스 등의 국가에서 여성들이 입는 전통의상이다. 블라우스, 원피스(혹은 조끼와 치마), 앞치마로 구성되어 있다. 이 의상은 블라우드루크 직물로 만들어진 디른들 원피스이다.
@@ -1533,7 +1596,7 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g48_1">
 		<![CDATA[
 <b>염색 커튼 ｜ Indigo-gefärbte Vorhänge ｜ Indigo-dyed Curtains </b><br>
-구타우염색박물관 (Färbermuseum Gutau) <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 1851 <br><br>
 
 블라우드루크 천으로 만들어진 커튼이다. 블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
 ]]>	</data>	
@@ -1541,7 +1604,7 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g48_2">
 		<![CDATA[
 <b>염색 이불 ｜ Indigo-gefärbte Decke ｜ Indigo-dyed Blanket</b><br>
-구타우염색박물관 (Färbermuseum Gutau) <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 1926 <br><br>
 
 블라우드루크 천으로 만들어진 이불이다. 블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
 ]]>	</data>	
@@ -1549,7 +1612,7 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g48_3">
 		<![CDATA[
 <b>염색 베개 ｜ Kissenbezug (indigogefärbt) ｜ Indigo-dyed Pillow </b><br>
-구타우염색박물관 (Färbermuseum Gutau) <br><br>
+구타우염색박물관 (Färbermuseum Gutau) · 1926 <br><br>
 
 블라우드루크 천으로 만들어진 베개이다.  블라우드루크는 의상 뿐만 아니라 생활용품으로도 흔히 사용된다.
 ]]>	</data>	
@@ -1586,6 +1649,14 @@ Apron used for blaudruck (blueprint) work
 ]]>
 </data>	
 
+				<data name="cap_g52_2">
+		<![CDATA[
+<b>구타우 염색시장 패션쇼 의상 ｜ Kleidung ｜  Clothes<br>
+상의: 마리아 바그너 레온딩 (Marie Wagner Leonding), 하의 : 오버외스터라이히 하이마트베르크 (Oberösterreichisches Heimatwerk ) · 2024 <br><br>
+
+구타우 염색시장의 패션쇼에 올라갔던 의상이다. 구타우 염색시장은 매년 5월 첫째주 일요일에 열리며 유럽의 염색장인들이 운영하는 부스와 더불어 패션쇼, 공연 등 다양한 행사를 선보인다.
+]]>
+</data>	
 
 				<data name="cap_g53_1">
 		<![CDATA[
@@ -2340,16 +2411,29 @@ Apron used for blaudruck (blueprint) work
 						);
 					" />
 					
-			<hotspot name="hs_gallery_39_2"
+<hotspot name="hs_gallery_39_2"
 			url="images/Click.png"
 			ath="64.0120" atv="30.6259" scale="0.35"
 			distorted="false"
 			handcursor="true"
 				onclick="
-				set_gallery_caps_from_data(cap_g39_2,cap_g39_2);
-				open_gallery(2,
+				set_gallery_caps_from_data(cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2,cap_g39_2);
+				open_gallery(15,
 					'images/gallery/39_2_1.jpg',
-					'images/gallery/39_2_2.jpg'
+					'images/gallery/39_2_2.jpg',
+					'images/gallery/39_2_3.jpg',
+					'images/gallery/39_2_4.jpg',
+					'images/gallery/39_2_5.jpg',
+					'images/gallery/39_2_6.jpg',
+					'images/gallery/39_2_7.jpg',
+					'images/gallery/39_2_8.jpg',
+					'images/gallery/39_2_9.jpg',
+					'images/gallery/39_2_10.jpg',
+					'images/gallery/39_2_11.jpg',
+					'images/gallery/39_2_12.jpg',
+					'images/gallery/39_2_13.jpg',
+					'images/gallery/39_2_14.jpg',
+					'images/gallery/39_2_15.jpg'
 				);
 			" />
 					
@@ -4186,7 +4270,7 @@ Apron used for blaudruck (blueprint) work
 					
 													<hotspot name="hs_gallery_52_1"
 			url="images/Click.png"
-			ath="-161.7908" atv="-2.8841"
+			 ath="165.5236" atv="-4.6587" 
 			scale="0.35"
 			distorted="false"
 			handcursor="true"
@@ -4205,7 +4289,19 @@ Apron used for blaudruck (blueprint) work
 					<!-- 의상 -->	
 		
 		
-		
+			<hotspot name="hs_gallery_52_2"
+			url="images/Click.png"
+			ath="-125.5664" atv="-5.2056"
+			scale="0.35"
+			distorted="false"
+			handcursor="true"
+			onclick="
+						set_gallery_caps_from_data(cap_g52_2);
+						open_gallery(1,
+						'images/gallery/52_2_1.jpg'
+			
+						);
+					" />
 		
 
 	</scene>
@@ -4312,9 +4408,11 @@ Apron used for blaudruck (blueprint) work
 				distorted="false"
 				handcursor="true"
 				onclick="
-							set_gallery_caps_from_data(cap_g53_2);
-							open_gallery(1,
-							'images/gallery/53_2_1.jpg'
+							set_gallery_caps_from_data(cap_g53_2,cap_g53_2,cap_g53_2);
+							open_gallery(3,
+							'images/gallery/53_2_1.jpg',
+							'images/gallery/53_2_2.jpg',
+							'images/gallery/53_2_3.jpg'
 							);
 						" />
 		
