@@ -1919,7 +1919,7 @@ Apron used for blaudruck (blueprint) work
 			ath="103.4914" atv="24.6272" 		 onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_37);" />
 
-								<hotspot name="hsp_35_38"
+					<hotspot name="hsp_35_38"
 			style="hs_anim"
 			url="Animated/ani38.png"
 			animurl="Animated/ani38.png"
@@ -1947,7 +1947,6 @@ Apron used for blaudruck (blueprint) work
 			animurl="Animated/ani41.png"
 			ath="99.4026" atv="6.1917"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_41);" />
-
 
 
 			<hotspot name="hs_article_33"
@@ -2003,7 +2002,7 @@ Apron used for blaudruck (blueprint) work
 				ath="-10.9592" atv="4.3734"	 onclick="loadscene(scene_35,null,MERGE,BLEND(0.5));"
 						onloaded="hs_play(hsp_36_35);" />
 
-		
+				
 						<hotspot name="hsp_36_37"
 				style="hs_anim"
 				url="Animated/ani37.png"
@@ -2055,7 +2054,6 @@ Apron used for blaudruck (blueprint) work
 				animurl="Animated/ani43.png"
 				ath="-179.4277" atv="5.8500"		 onclick="loadscene(scene_43,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_43);" />
-
 
 
 						<hotspot name="hs_gallery_35_1"
