@@ -158,22 +158,27 @@
 	</action>
 
 <action name="show_text_from_data">
-	close_gallery();
-	
-    set(layer[info_panel].visible, true);
-    set(layer[info_panel].enabled, true); set(layer[info_panel].alpha, 1.0);
-
+    close_gallery();
+    
     set(layer[info_panel_title].html, get:data[%1].content);
     set(layer[info_panel_text].html,  get:data[%2].content);
-
     set(layer[info_panel_text].y, 0);
-
-delayedcall(0.2, 
-    layer[info_panel_title].update();
-    layer[info_panel_text].update();
-    calc(layer[info_panel_mask].y, layer[info_panel_title].y + layer[info_panel_title].pixelheight + 30);
-    calc(layer[info_panel_mask].height, -30 - get(layer[info_panel_mask].y));
-    update_info_scrollbar(); );
+    
+    set(layer[info_scroll_bar].alpha, 0);
+    
+    delayedcall(0.03, 
+        layer[info_panel_title].update();
+        layer[info_panel_text].update();
+        
+        calc(layer[info_panel_mask].y, layer[info_panel_title].y + layer[info_panel_title].pixelheight + 30);
+        
+        set(layer[info_panel].visible, true);
+        set(layer[info_panel].enabled, true); 
+        set(layer[info_panel].alpha, 1.0);
+        
+        update_info_scrollbar();
+        tween(layer[info_scroll_bar].alpha, 0.8, 0.1);
+    );
 </action>
 
 <layer name="info_panel" type="container" keep="true" visible="false" enabled="true" align="righttop" 
@@ -191,9 +196,25 @@ delayedcall(0.2,
     <layer name="info_panel_mask" type="container" align="lefttop" x="24" y="200" 
 	width="452" height="700" maskchildren="true" bgcolor="0x000000" bgalpha="0.0" capture="false">
 
-	<layer name="info_scroll_track" type="container" align="righttop" x="5" y="0" width="4" height="100%" bgcolor="0x000000" bgalpha="0.1" zorder="10" />
+	<layer name="info_scroll_track" 
+       type="container" align="righttop" x="5" y="0" width="10" height="100%" 
+       bgcolor="0x000000" 
+       bgalpha="0.3"       zorder="10" 
+       enabled="true" capture="true" bgcapture="true"
+       ondown="drag_info_scrollbar();" visible="false" />
+	
+	
 
-    <layer name="info_scroll_bar" type="container" align="righttop" x="5" y="0" width="4" height="50" bgcolor="0x666666" bgalpha="0.8" zorder="11" visible="false" />
+	
+	<layer name="info_scroll_bar" 
+       type="container" align="righttop" x="5" y="0" width="9" height="50" 
+       bgcolor="0x666666" bgalpha="0.8" zorder="11" alpha="0" visible="false"
+       enabled="true" 
+       capture="true" 
+	   handcursor="true"
+	   onmousewheel="calc(layer[info_panel_text].y, layer[info_panel_text].y + (wheeldelta * 40)); calc(y_min, layer[info_panel_mask].pixelheight - layer[info_panel_text].pixelheight); clamp(layer[info_panel_text].y, get(y_min), 0); update_info_scrollbar();"
+       ondown="drag_info_scrollbar();" />
+
 
     <layer name="info_panel_text" type="text" align="lefttop" x="0" y="0" width="-20"
 	autoheight="true" html="true" enabled="true" background="false" capture="true"
@@ -207,11 +228,15 @@ delayedcall(0.2,
     set(layer[info_panel].alpha, 0.0);
     set(layer[info_panel].visible, false);
     set(layer[info_panel].enabled, false);
+
+	set(layer[info_panel_title].html, "");
+    set(layer[info_panel_text].html, "");
+
     stoptween(layer[info_panel].alpha);
 </action>
 
 <action name="update_info_scrollbar">
-	calc(text_h, layer[info_panel_text].pixelheight);
+calc(text_h, layer[info_panel_text].pixelheight);
     calc(mask_h, layer[info_panel_mask].pixelheight);
     
     if(text_h GT mask_h,
@@ -219,13 +244,49 @@ delayedcall(0.2,
         set(layer[info_scroll_track].visible, true);
         
         calc(layer[info_scroll_bar].height, (mask_h / text_h) * mask_h);
-        
         calc(scroll_range, text_h - mask_h);
         calc(bar_range, mask_h - layer[info_scroll_bar].height);
         calc(layer[info_scroll_bar].y, (layer[info_panel_text].y / (scroll_range * -1)) * bar_range);
     ,
         set(layer[info_scroll_bar].visible, false);
         set(layer[info_scroll_track].visible, false);
+        set(layer[info_scroll_bar].y, 0);
+        set(layer[info_panel_text].y, 0);
+    );
+</action>
+
+<action name="drag_info_scrollbar">
+    copy(start_mouse_y, mouse.stagey);
+    copy(start_bar_y, layer[info_scroll_bar].y);
+    
+    calc(bar_range, layer[info_panel_mask].pixelheight - layer[info_scroll_bar].pixelheight);
+    calc(text_range, layer[info_panel_text].pixelheight - layer[info_panel_mask].pixelheight);
+
+    asyncloop(pressed,
+        calc(layer[info_scroll_bar].y, start_bar_y + (mouse.stagey - start_mouse_y));
+        
+        clamp(layer[info_scroll_bar].y, 0, get(bar_range));
+        
+        if(bar_range GT 0,
+            calc(layer[info_panel_text].y, (layer[info_scroll_bar].y / bar_range) * text_range * -1);
+        );
+    );
+</action>
+
+<action name="drag_gallery_scrollbar">
+    copy(start_mouse_y, mouse.stagey);
+    copy(start_bar_y, layer[gallery_scroll_bar].y);
+    
+    calc(bar_range, layer[gallery_caption_mask].pixelheight - layer[gallery_scroll_bar].pixelheight);
+    calc(text_range, layer[gallery_caption].pixelheight - layer[gallery_caption_mask].pixelheight);
+
+    asyncloop(pressed,
+        calc(layer[gallery_scroll_bar].y, start_bar_y + (mouse.stagey - start_mouse_y));
+        clamp(layer[gallery_scroll_bar].y, 0, get(bar_range));
+        
+        if(bar_range GT 0,
+            calc(layer[gallery_caption].y, (layer[gallery_scroll_bar].y / bar_range) * text_range * -1);
+        );
     );
 </action>
 
@@ -254,6 +315,7 @@ delayedcall(0.2,
 		if(%1 GE 13, set(gallery.img13,%14); );
 		if(%1 GE 14, set(gallery.img14,%15); );
 		if(%1 GE 15, set(gallery.img15,%16); );
+		if(%1 GE 15, set(gallery.img16,%17); );
 
 		set(gallery.index,1);
 
@@ -310,10 +372,10 @@ delayedcall(0.2,
     if(gallery.index == 13, set(layer[gallery_img].url, get(gallery.img13)); );
     if(gallery.index == 14, set(layer[gallery_img].url, get(gallery.img14)); );
     if(gallery.index == 15, set(layer[gallery_img].url, get(gallery.img15)); );
+    if(gallery.index == 16, set(layer[gallery_img].url, get(gallery.img16)); );
 
-    set(layer[gallery_caption].y, 0);
-    
-    set(layer[gallery_img].alpha, 0.0);
+set(layer[gallery_caption].y, 0);
+    set(layer[gallery_caption].html, ""); set(layer[gallery_img].alpha, 0.0);
     set(layer[gallery_img].visible, true);
     set(layer[gallery_img].onloaded, gallery_fit_and_fade(); );
 
@@ -368,7 +430,8 @@ delayedcall(0.2,
 		set(gallery.cap12, %12);
 		set(gallery.cap13, %13);
 		set(gallery.cap14, %14);
-		set(gallery.cap14, %15);
+		set(gallery.cap15, %15);
+		set(gallery.cap16, %16);
 	</action>
 
 	<!-- show_text_from_data 방식처럼 "data[]의 content"를 직접 읽어서 출력 -->
@@ -409,12 +472,27 @@ delayedcall(0.2,
 		if(gallery.index == 12,
 		if(gallery.cap12, set(layer[gallery_caption].html, get(data[get(gallery.cap12)].content)); , set(layer[gallery_caption].html,''); );
 		);
+				if(gallery.index == 13,
+		if(gallery.cap13, set(layer[gallery_caption].html, get(data[get(gallery.cap13)].content)); , set(layer[gallery_caption].html,''); );
+		);
+				if(gallery.index == 14,
+		if(gallery.cap14, set(layer[gallery_caption].html, get(data[get(gallery.cap14)].content)); , set(layer[gallery_caption].html,''); );
+		);
+				if(gallery.index == 15,
+		if(gallery.cap15, set(layer[gallery_caption].html, get(data[get(gallery.cap15)].content)); , set(layer[gallery_caption].html,''); );
+		);				if(gallery.index == 16,
+		if(gallery.cap16, set(layer[gallery_caption].html, get(data[get(gallery.cap16)].content)); , set(layer[gallery_caption].html,''); );
+		);
 
 set(layer[gallery_caption].y, 0);
-delayedcall(0.1, 
-    layer[gallery_caption].update(); 
-    update_gallery_scrollbar(); );
-	</action>
+    set(layer[gallery_scroll_bar].alpha, 0);
+
+    delayedcall(0.03, 
+        layer[gallery_caption].update(); 
+        update_gallery_scrollbar(); 
+        tween(layer[gallery_scroll_bar].alpha, 0.8, 0.1);
+    );
+</action>
 
 	<layer name="gallery_bg"
 	type="container" keep="true"
@@ -519,9 +597,21 @@ delayedcall(0.1,
            type="container" align="lefttop" x="20" y="15" 
            width="-40" height="-30" maskchildren="true" bgalpha="0.0" capture="false">
 
-		   <layer name="gallery_scroll_track" type="container" align="righttop" x="0" y="0" width="3" height="100%" bgcolor="0xffffff" bgalpha="0.1" zorder="10" />
-
-    <layer name="gallery_scroll_bar" type="container" align="righttop" x="0" y="0" width="3" height="50" bgcolor="0xffffff" bgalpha="0.6" zorder="11" visible="false" />
+<layer name="gallery_scroll_track" 
+       type="container" align="righttop" x="2" y="0" width="9" height="100%" 
+       bgcolor="0xffffff" 
+       bgalpha="0.2"       zorder="10" 
+       enabled="true" capture="true" bgcapture="true"
+       ondown="drag_gallery_scrollbar();" visible="false" />
+	   
+	<layer name="gallery_scroll_bar" 
+       type="container" align="righttop" x="2" y="0" width="8" height="50" 
+       bgcolor="0xffffff" bgalpha="0.8" zorder="11" alpha="0" visible="false"
+       enabled="true" 
+       capture="true" 
+		handcursor="true"
+		onmousewheel="calc(layer[gallery_caption].y, layer[gallery_caption].y + (wheeldelta * 40)); calc(y_min, layer[gallery_caption_mask].pixelheight - layer[gallery_caption].pixelheight); if(y_min LT 0, clamp(layer[gallery_caption].y, get(y_min), 0), set(layer[gallery_caption].y,0)); update_gallery_scrollbar();"
+       ondown="drag_gallery_scrollbar();" />
 
         <layer name="gallery_caption"
                type="text"
@@ -541,21 +631,21 @@ delayedcall(0.1,
 </layer>
 
 
-	<action name="close_gallery">
-		set(layer[gallery_bg].visible,false);
-		set(layer[gallery_bg].enabled,false);
+<action name="close_gallery">
+    set(layer[gallery_bg].visible, false);
+    set(layer[gallery_bg].enabled, false);
 
-		<!-- 다음 오픈을 위한 상태 초기화 -->
-		set(layer[gallery_img].onloaded, null);
-		set(layer[gallery_img].url, null);
-		set(layer[gallery_img].alpha, 1.0);
-		set(layer[gallery_img].scale, 1.0);
+    set(layer[gallery_img].onloaded, null);
+    set(layer[gallery_img].url, null);
+    set(layer[gallery_img].alpha, 0.0); set(layer[gallery_img].scale, 1.0);
 
-		set(layer[gallery_caption].html, '');
-	</action>
+    set(layer[gallery_caption].html, "");
+    set(layer[gallery_caption].y, 0);
+    set(layer[gallery_scroll_bar].visible, false);
+</action>
 	
-	<action name="update_gallery_scrollbar">
-	calc(text_h, layer[gallery_caption].pixelheight);
+<action name="update_gallery_scrollbar">
+    calc(text_h, layer[gallery_caption].pixelheight);
     calc(mask_h, layer[gallery_caption_mask].pixelheight);
     
     if(text_h GT mask_h,
@@ -563,13 +653,14 @@ delayedcall(0.1,
         set(layer[gallery_scroll_track].visible, true);
         
         calc(layer[gallery_scroll_bar].height, (mask_h / text_h) * mask_h);
-        
         calc(scroll_range, text_h - mask_h);
         calc(bar_range, mask_h - layer[gallery_scroll_bar].height);
         calc(layer[gallery_scroll_bar].y, (layer[gallery_caption].y / (scroll_range * -1)) * bar_range);
     ,
         set(layer[gallery_scroll_bar].visible, false);
         set(layer[gallery_scroll_track].visible, false);
+        set(layer[gallery_scroll_bar].y, 0);
+        set(layer[gallery_caption].y, 0);
     );
 </action>
 	
@@ -1766,7 +1857,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani35.png"
 				animurl="Animated/ani35.png"
-		ath="95.5116" atv="33.7508"  		 onclick="loadscene(scene_35,null,MERGE,BLEND(0.5));"
+		ath="83.2744" atv="18.4472"  		 onclick="loadscene(scene_35,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_34_35);" />
 
 
@@ -1781,7 +1872,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani38.png"
 				animurl="Animated/ani38.png"
-		ath="133.4219" atv="15.1051"		 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+		ath="130.4413" atv="11.1947"		 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_34_38);" />
 
 
@@ -1828,18 +1919,18 @@ Apron used for blaudruck (blueprint) work
 			ath="103.4914" atv="24.6272" 		 onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_37);" />
 
-					<hotspot name="hsp_35_38"
+								<hotspot name="hsp_35_38"
 			style="hs_anim"
 			url="Animated/ani38.png"
 			animurl="Animated/ani38.png"
-			ath="80.1215" atv="19.8227" 	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+			ath="74.7612" atv="15.6933"  	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_38);" />
 
 					<hotspot name="hsp_35_39"
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="80.9794" atv="12.4665" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="81.0876" atv="6.1618"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_39);" />
 
 
@@ -1847,15 +1938,16 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani40.png"
 			animurl="Animated/ani40.png"
-			ath="88.3890" atv="11.7954" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+			ath="88.0309" atv="6.6778"	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_40);" />
 
 					<hotspot name="hsp_35_41"
 			style="hs_anim"
 			url="Animated/ani41.png"
 			animurl="Animated/ani41.png"
-			ath="99.9816" atv="11.4018"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+			ath="99.4026" atv="6.1917"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_35_41);" />
+
 
 
 			<hotspot name="hs_article_33"
@@ -1916,14 +2008,14 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani37.png"
 				animurl="Animated/ani37.png"
-				ath="-175.7138" atv="25.0621" 		 onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
+				ath="-165.3370" atv="5.5821" 		 onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_37);" />
 
 						<hotspot name="hsp_36_38"
 				style="hs_anim"
 				url="Animated/ani38.png"
 				animurl="Animated/ani38.png"
-				ath="139.1251" atv="27.4884"	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+				ath="134.1828" atv="21.6539" 	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_38);" />
 
 
@@ -1931,7 +2023,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani39.png"
 				animurl="Animated/ani39.png"
-				ath="138.2835" atv="14.8249"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+				ath="138.5316" atv="7.1633" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_39);" />
 
 
@@ -1939,21 +2031,21 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani40.png"
 				animurl="Animated/ani40.png"
-				ath="145.2184" atv="13.9894" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+				ath="145.0623" atv="7.0565"	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_40);" />
 
 						<hotspot name="hsp_36_41"
 				style="hs_anim"
 				url="Animated/ani41.png"
 				animurl="Animated/ani41.png"
-				ath="159.2757" atv="12.9852"		 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+				ath="157.8658" atv="7.4458"		 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_41);" />
 
 						<hotspot name="hsp_36_42"
 				style="hs_anim"
 				url="Animated/ani42.png"
 				animurl="Animated/ani42.png"
-				ath="170.9305" atv="10.3904" 	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+				ath="169.6131" atv="6.3797"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_36_42);" />
 
 
@@ -2061,7 +2153,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani36.png"
 		animurl="Animated/ani36.png"
-		ath="-9.9569" atv="17.9768"		
+		ath="-6.1025" atv="4.2071"	
 						distorted="false"
 		onclick="loadscene(scene_36,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_36);" />
@@ -2079,7 +2171,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani39.png"
 		animurl="Animated/ani39.png"
-		ath="83.2774" atv="34.8629"   distorted="false"
+		ath="77.0572" atv="26.1874"   distorted="false"
 		onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_39);" />
 
@@ -2087,7 +2179,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani40.png"
 		animurl="Animated/ani40.png"
-		ath="114.1666" atv="29.5576" 	 distorted="false"
+		ath="117.7964" atv="20.4641"	 distorted="false"
 		onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_40);" />
 
@@ -2095,7 +2187,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani41.png"
 		animurl="Animated/ani41.png"
-		ath="157.6547" atv="29.3780"	 distorted="false"
+		ath="156.4393" atv="20.2849"	 distorted="false"
 		onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_41);" />
 
@@ -2103,7 +2195,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani42.png"
 		animurl="Animated/ani42.png"
-		ath="-177.4493" atv="21.6706" 	 distorted="false"
+		ath="-179.4918" atv="14.7930"	 distorted="false"
 		onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_42);" />
 
@@ -2119,7 +2211,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani44.png"
 		animurl="Animated/ani44.png"
-		ath="-152.2984" atv="9.7293"  distorted="false"
+		ath="-153.4432" atv="5.4137"   distorted="false"
 		onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_37_44);" />
 
@@ -2151,6 +2243,7 @@ Apron used for blaudruck (blueprint) work
 							/>
 
 		<hotspot name="hsp_37_video" style="vid_hs_addhs" scalez="1.850" scale="1.85" ath="-94.6879" atv="0.8992" tx="146.6000" ty="2.4000" tz="-118.0000"  videourl="%FIRSTXML%/add_hotspot/video/37_video.mp4" info_ah="37_video.mp4" loop="true" play_vh="true" drag_hs="false"  pausedonstart="false" />
+
 
 	</scene>
 
@@ -2198,7 +2291,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani36.png"
 				animurl="Animated/ani36.png"
-				ath="2.6947" atv="25.4698"
+				ath="10.1425" atv="9.0192" 
 				distorted="false"		
 				onclick="loadscene(scene_36,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_36);" />
@@ -2216,7 +2309,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani39.png"
 				animurl="Animated/ani39.png"
-				ath="123.8816" atv="26.1127" 
+				ath="115.4521" atv="21.6961"
 				distorted="false"		
 				onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_39);" />
@@ -2225,7 +2318,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani40.png"
 				animurl="Animated/ani40.png"
-				ath="137.8207" atv="20.8572"
+				ath="139.1081" atv="15.2112" 
 				distorted="false"		
 				onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_40);" />
@@ -2236,7 +2329,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani41.png"
 				animurl="Animated/ani41.png"
-				ath="169.0403" atv="21.2700"
+				ath="167.4169" atv="14.7061" 
 				distorted="false"		
 				onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_41);" />
@@ -2246,7 +2339,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani42.png"
 				animurl="Animated/ani42.png"
-				ath="-170.8735" atv="16.5828" 
+				ath="-173.2004" atv="11.6052"
 				distorted="false"		
 				onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_42);" />
@@ -2266,7 +2359,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani44.png"
 				animurl="Animated/ani44.png"
-				ath="-147.5435" atv="8.1014"
+				ath="-150.5633" atv="5.1307" 
 				distorted="false"
 				onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_38_44);" />
@@ -2331,14 +2424,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani38.png"
 			animurl="Animated/ani38.png"
-			ath="-34.0794" atv="43.5792"  onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+			ath="-23.7258" atv="32.2004"  onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_39_38);" />
 
 					<hotspot name="hsp_39_40"
 			style="hs_anim"
 			url="Animated/ani40.png"
 			animurl="Animated/ani40.png"
-			ath="144.3092" atv="37.0028" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+			ath="144.5474" atv="24.1425" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_39_40);" />
 
 
@@ -2347,14 +2440,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani41.png"
 			animurl="Animated/ani41.png"
-			ath="-176.9558" atv="28.0803"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+			ath="179.1553" atv="18.9752"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_39_41);" />
 
 					<hotspot name="hsp_39_42"
 			style="hs_anim"
 			url="Animated/ani42.png"
 			animurl="Animated/ani42.png"
-			ath="-160.9606" atv="18.1837"  	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+			ath="-164.8664" atv="13.0860"  	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_39_42);" />
 
 
@@ -2370,7 +2463,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="-146.2536" atv="8.6351" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+			ath="-148.7868" atv="5.9672" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_39_44);" />
 
 					<hotspot name="hsp_39_46"
@@ -2411,7 +2504,7 @@ Apron used for blaudruck (blueprint) work
 						);
 					" />
 					
-<hotspot name="hs_gallery_39_2"
+			<hotspot name="hs_gallery_39_2"
 			url="images/Click.png"
 			ath="64.0120" atv="30.6259" scale="0.35"
 			distorted="false"
@@ -2541,14 +2634,14 @@ Apron used for blaudruck (blueprint) work
 					style="hs_anim"
 					url="Animated/ani38.png"
 					animurl="Animated/ani38.png"
-					ath="-14.0510" atv="25.6519" onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+					ath="-7.8941" atv="19.4601"  onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_38);" />
 
 							<hotspot name="hsp_40_39"
 					style="hs_anim"
 					url="Animated/ani39.png"
 					animurl="Animated/ani39.png"
-					ath="31.6400" atv="51.0941" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+					ath="45.6493" atv="39.9655"  	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_39);" />
 
 
@@ -2557,14 +2650,14 @@ Apron used for blaudruck (blueprint) work
 					style="hs_anim"
 					url="Animated/ani41.png"
 					animurl="Animated/ani41.png"
-					ath="-130.1296" atv="43.1813" 	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+					ath="-152.4156" atv="33.2402"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_41);" />
 
 							<hotspot name="hsp_40_42"
 					style="hs_anim"
 					url="Animated/ani42.png"
 					animurl="Animated/ani42.png"
-					ath="-125.3904" atv="22.7439"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+					ath="-135.3214" atv="17.6114" 	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_42);" />
 
 
@@ -2580,14 +2673,14 @@ Apron used for blaudruck (blueprint) work
 					style="hs_anim"
 					url="Animated/ani44.png"
 					animurl="Animated/ani44.png"
-					ath="-122.0741" atv="9.1500"  onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+					ath="-124.3842" atv="5.5872"  onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_44);" />
 
 							<hotspot name="hsp_40_45"
 					style="hs_anim"
 					url="Animated/ani45.png"
 					animurl="Animated/ani45.png"
-					ath="-110.3881" atv="10.7468" 	 onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
+					ath="-105.1476" atv="6.4296" 	 onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_45);" />
 
 
@@ -2595,7 +2688,7 @@ Apron used for blaudruck (blueprint) work
 					style="hs_anim"
 					url="Animated/ani46.png"
 					animurl="Animated/ani46.png"
-					ath="-106.6541" atv="15.2708"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+					ath="-99.1328" atv="3.7478"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 					onloaded="hs_play(hsp_40_46);" />
 
 					
@@ -2754,7 +2847,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="42.7966" atv="27.8851"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="43.7039" atv="20.6450"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_39);" />
 
 
@@ -2763,14 +2856,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani40.png"
 			animurl="Animated/ani40.png"
-			ath="64.6638" atv="35.1419" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+			ath="77.6642" atv="28.4180"	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_40);" />
 
 					<hotspot name="hsp_41_42"
 			style="hs_anim"
 			url="Animated/ani42.png"
 			animurl="Animated/ani42.png"
-			ath="-128.5386" atv="43.1959"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+			ath="-150.9017" atv="31.0148"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_42);" />
 
 
@@ -2778,7 +2871,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani43.png"
 			animurl="Animated/ani43.png"
-			ath="-135.2486" atv="20.2219"	 onclick="loadscene(scene_43,null,MERGE,BLEND(0.5));"
+			ath="-135.3631" atv="14.5263" 	 onclick="loadscene(scene_43,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_43);" />
 
 
@@ -2786,14 +2879,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="-126.8048" atv="13.0748"	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+			ath="-130.0604" atv="8.5410" 	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_44);" />
 
 					<hotspot name="hsp_41_45"
 			style="hs_anim"
 			url="Animated/ani45.png"
 			animurl="Animated/ani45.png"
-			ath="-112.0637" atv="12.4249"	 onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
+			ath="-105.3393" atv="5.7043"	 onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_45);" />
 
 
@@ -2801,7 +2894,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani46.png"
 			animurl="Animated/ani46.png"
-			ath="-103.4305" atv="19.1073"  	 onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+			ath="-96.0165" atv="3.9934"  	 onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_41_46);" />
 
 					<hotspot name="hsp_41_47"
@@ -2904,14 +2997,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani36.png"
 			animurl="Animated/ani36.png"
-			ath="-4.3792" atv="10.8738" 	 onclick="loadscene(scene_36,null,MERGE,BLEND(0.5));"
+			ath="-1.6951" atv="2.2738" 	 onclick="loadscene(scene_36,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_36);" />
 
 					<hotspot name="hsp_42_37"
 			style="hs_anim"
 			url="Animated/ani37.png"
 			animurl="Animated/ani37.png"
-			ath="-18.2568" atv="19.6024"   onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
+			ath="-19.0583" atv="5.0452"   onclick="loadscene(scene_37,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_37);" />
 
 					<hotspot name="hsp_42_38"
@@ -2925,7 +3018,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="35.1033" atv="17.9133" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="36.3147" atv="13.4170"  	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_39);" />
 
 
@@ -2933,14 +3026,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani40.png"
 			animurl="Animated/ani40.png"
-			ath="46.5957" atv="20.0859" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+			ath="54.1260" atv="15.4892" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_40);" />
 
 					<hotspot name="hsp_42_41"
 			style="hs_anim"
 			url="Animated/ani41.png"
 			animurl="Animated/ani41.png"
-			ath="53.0454" atv="36.9586"	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+			ath="75.6770" atv="30.0948"  onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_41);" />
 
 
@@ -2956,7 +3049,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="-146.8839" atv="21.4751" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+			ath="-153.4473" atv="15.6451" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_42_44);" />
 
 					<hotspot name="hsp_42_45"
@@ -3056,7 +3149,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani38.png"
 				animurl="Animated/ani38.png"
-				ath="8.2038" atv="11.4184" onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+				ath="9.9342" atv="7.2798"  onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_38);" />
 
 
@@ -3064,7 +3157,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani39.png"
 				animurl="Animated/ani39.png"
-				ath="29.8626" atv="12.6869"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+				ath="30.7763" atv="8.6612"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_39);" />
 
 
@@ -3073,14 +3166,14 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani40.png"
 				animurl="Animated/ani40.png"
-				ath="37.6557" atv="14.0525" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+				ath="45.3223" atv="9.6953"  	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_40);" />
 
 						<hotspot name="hsp_43_41"
 				style="hs_anim"
 				url="Animated/ani41.png"
 				animurl="Animated/ani41.png"
-				ath="36.0973" atv="20.5476"	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+				ath="47.6334" atv="15.3508" 	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_41);" />
 
 
@@ -3088,7 +3181,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani42.png"
 				animurl="Animated/ani42.png"
-				ath="35.6687" atv="33.8662"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+				ath="50.0592" atv="21.6763"  onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_42);" />
 
 
@@ -3096,7 +3189,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani44.png"
 				animurl="Animated/ani44.png"
-				ath="-137.6606" atv="34.5627" 	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+				ath="-145.4923" atv="20.5642" 	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_44);" />
 
 						<hotspot name="hsp_43_45"
@@ -3111,7 +3204,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani46.png"
 				animurl="Animated/ani46.png"
-				ath="-65.8174" atv="21.1874"   onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+				ath="-62.0450" atv="7.4645"   onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_46);" />
 
 						<hotspot name="hsp_43_47"
@@ -3125,7 +3218,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani48.png"
 				animurl="Animated/ani48.png"
-				ath="-122.0601" atv="10.6703"	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
+				 ath="-120.4791" atv="9.2231" 	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_43_48);" />
 
 						<hotspot name="hsp_43_51"
@@ -3167,7 +3260,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani38.png"
 			animurl="Animated/ani38.png"
-			ath="10.5652" atv="11.4306"	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
+			ath="11.5819" atv="6.6352" 	 onclick="loadscene(scene_38,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_38);" />
 
 
@@ -3175,7 +3268,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="26.1603" atv="10.7819"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="26.7533" atv="6.7563"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_39);" />
 
 
@@ -3184,21 +3277,21 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani40.png"
 			animurl="Animated/ani40.png"
-			ath="33.6689" atv="10.6036" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+			ath="38.4537" atv="7.6870" 	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_40);" />
 
 					<hotspot name="hsp_44_41"
 			style="hs_anim"
 			url="Animated/ani41.png"
 			animurl="Animated/ani41.png"
-			ath="34.3634" atv="14.9627"	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+			ath="40.0896" atv="10.7202"	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_41);" />
 
 					<hotspot name="hsp_44_42"
 			style="hs_anim"
 			url="Animated/ani42.png"
 			animurl="Animated/ani42.png"
-			ath="35.0683" atv="21.6511"	 onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+			ath="40.1965" atv="14.9565" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_42);" />
 
 
@@ -3214,7 +3307,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani46.png"
 			animurl="Animated/ani46.png"
-			ath="-18.5550" atv="23.1398" onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+			ath="-25.7773" atv="8.7330" onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_46);" />
 
 
@@ -3229,7 +3322,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani48.png"
 			animurl="Animated/ani48.png"
-			ath="-125.5431" atv="16.6466"  	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
+			ath="-120.8242" atv="11.7123" 	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_44_48);" />
 
 
@@ -3337,7 +3430,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani39.png"
 				animurl="Animated/ani39.png"
-				ath="47.0761" atv="8.9320"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+				ath="47.2924" atv="5.8108"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_45_39);" />
 
 
@@ -3353,7 +3446,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani41.png"
 				animurl="Animated/ani41.png"
-				ath="57.0036" atv="15.5086"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+				 ath="64.2844" atv="9.2888"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_45_41);" />
 
 
@@ -3361,7 +3454,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani42.png"
 				animurl="Animated/ani42.png"
-				ath="61.7458" atv="21.0699" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+				ath="68.5259" atv="11.7254" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_45_42);" />
 
 
@@ -3398,7 +3491,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani48.png"
 				animurl="Animated/ani48.png"
-				ath="-128.9211" atv="16.1942" 	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
+				ath="-121.7638" atv="13.1730"	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_45_48);" />
 
 						<hotspot name="hsp_45_49"
@@ -3470,7 +3563,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani39.png"
 		animurl="Animated/ani39.png"
-		ath="60.6941" atv="12.5314"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+		ath="60.5018" atv="7.9298"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_46_39);" />
 
 
@@ -3479,14 +3572,14 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani40.png"
 		animurl="Animated/ani40.png"
-		ath="69.8389" atv="12.3317"	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+		ath="75.7362" atv="7.7166"	 onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_46_40);" />
 
 				<hotspot name="hsp_46_41"
 		style="hs_anim"
 		url="Animated/ani41.png"
 		animurl="Animated/ani41.png"
-		ath="76.0697" atv="20.1093"	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+		ath="83.5238" atv="14.5980"  	 onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_46_41);" />
 
 
@@ -3494,7 +3587,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani42.png"
 		animurl="Animated/ani42.png"
-		ath="81.6596" atv="31.8023" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+		ath="96.0705" atv="22.0725" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_46_42);" />
 
 
@@ -3531,7 +3624,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani48.png"
 		animurl="Animated/ani48.png"
-		ath="-111.4501" atv="13.0603" 	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
+		ath="-107.3482" atv="10.4307"	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_46_48);" />
 
 				<hotspot name="hsp_46_49"
@@ -3576,7 +3669,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani39.png"
 		animurl="Animated/ani39.png"
-		ath="51.5196" atv="8.2518" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+		ath="51.6817" atv="4.6370" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_39);" />
 
 
@@ -3585,14 +3678,14 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani40.png"
 		animurl="Animated/ani40.png"
-		ath="58.3340" atv="8.2156"  onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
+		ath="61.5751" atv="5.3474"   onclick="loadscene(scene_40,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_40);" />
 
 				<hotspot name="hsp_47_41"
 		style="hs_anim"
 		url="Animated/ani41.png"
 		animurl="Animated/ani41.png"
-		ath="59.7209" atv="10.7111" onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+		ath="64.4150" atv="6.8854" onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_41);" />
 
 
@@ -3600,7 +3693,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani42.png"
 		animurl="Animated/ani42.png"
-		ath="60.3851" atv="14.0791" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+		ath="65.5950" atv="10.4622"  onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_42);" />
 
 
@@ -3615,7 +3708,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani44.png"
 		animurl="Animated/ani44.png"
-		ath="73.1112" atv="32.6686"	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+		ath="100.2883" atv="27.9386"	 onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_44);" />
 
 				<hotspot name="hsp_47_45"
@@ -3629,14 +3722,14 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani46.png"
 		animurl="Animated/ani46.png"
-		ath="32.1268" atv="15.9422"  	 onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+		ath="30.2650" atv="2.1559"  	 onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_46);" />
 
 				<hotspot name="hsp_47_48"
 		style="hs_anim"
 		url="Animated/ani48.png"
 		animurl="Animated/ani48.png"
-		ath="-105.5904" atv="26.9670"	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
+		ath="-99.8598" atv="19.6176"	 onclick="loadscene(scene_48,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_48);" />
 
 
@@ -3644,7 +3737,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani49.png"
 		animurl="Animated/ani49.png"
-		ath="-155.9843" atv="26.4695"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
+		ath="-161.3015" atv="15.6246"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_47_49);" />
 
 				<hotspot name="hsp_47_50"
@@ -3790,14 +3883,14 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani41.png"
 				animurl="Animated/ani41.png"
-				ath="72.4474" atv="6.5233" onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
+				ath="74.1213" atv="4.0645" onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_41);" />
 
 									<hotspot name="hsp_48_42"
 				style="hs_anim"
 				url="Animated/ani42.png"
 				animurl="Animated/ani42.png"
-				ath="73.9752" atv="8.6591" onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
+				ath="76.1038" atv="5.1935"  onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_42);" />
 
 
@@ -3805,21 +3898,21 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani44.png"
 				animurl="Animated/ani44.png"
-				ath="79.9262" atv="16.9115" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+				ath="93.1402" atv="14.6450" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_44);" />
 
 						<hotspot name="hsp_48_45"
 				style="hs_anim"
 				url="Animated/ani45.png"
 				animurl="Animated/ani45.png"
-				ath="58.5837" atv="16.0933"  onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
+				ath="52.4363" atv="9.6000" onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_45);" />
 
 						<hotspot name="hsp_48_46"
 				style="hs_anim"
 				url="Animated/ani46.png"
 				animurl="Animated/ani46.png"
-				ath="60.5843" atv="10.0429"   onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+				ath="55.2941" atv="1.6764"   onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_46);" />		
 
 						<hotspot name="hsp_48_47"
@@ -3834,7 +3927,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani49.png"
 				animurl="Animated/ani49.png"
-				ath="158.0413" atv="33.9466"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
+				ath="152.3158" atv="14.0348"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_49);" />
 
 
@@ -3871,7 +3964,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani54.png"
 				animurl="Animated/ani54.png"
-				ath="-91.0238" atv="14.8300"	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+				ath="-87.9911" atv="11.4886"	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_48_54);" />
 
 						<hotspot name="hsp_48_55"
@@ -3912,7 +4005,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="63.1247" atv="5.5938" 
+			ath="63.1301" atv="2.9327"
 			onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_39);" />
 
@@ -3935,7 +4028,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani46.png"
 			animurl="Animated/ani46.png"
-			ath="51.9786" atv="9.9177"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+			ath="47.1764" atv="0.2041"   onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_46);" />
 
 
@@ -3972,28 +4065,28 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani52.png"
 			animurl="Animated/ani52.png"
-			ath="-49.5365" atv="22.7177"  	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+			ath="-43.7680" atv="16.5478"   	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_52);" />
 					
 					<hotspot name="hsp_49_53"
 			style="hs_anim"
 			url="Animated/ani53.png"
 			animurl="Animated/ani53.png"
-			ath="-61.6417" atv="18.4882"	 onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
+			ath="-56.2442" atv="11.5115"	 onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_53);" />
 
 					<hotspot name="hsp_49_54"
 			style="hs_anim"
 			url="Animated/ani54.png"
 			animurl="Animated/ani54.png"
-			ath="-75.5735" atv="13.9372"	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+			ath="-73.1384" atv="9.9457"	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_54);" />
 
 					<hotspot name="hsp_49_55"
 			style="hs_anim"
 			url="Animated/ani55.png"
 			animurl="Animated/ani55.png"
-			ath="-85.2862" atv="10.2689"	 onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
+			ath="-85.0957" atv="9.4390" 	 onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_49_55);" />
 
 											<hotspot name="hs_gallery_50_1"
@@ -4069,7 +4162,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="-1.9632" atv="5.7833"	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="59.0368" atv="1.4510" 	 onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_39);" />
 
 					<hotspot name="hsp_50_44"
@@ -4090,7 +4183,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani46.png"
 			animurl="Animated/ani46.png"
-			ath="-10.5517" atv="9.8579"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+			ath="-12.9324" atv="0.6629"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_46);" />
 
 					<hotspot name="hsp_50_47"
@@ -4112,35 +4205,35 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani49.png"
 			animurl="Animated/ani49.png"
-			ath="7.7114" atv="37.2948"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
+			ath="18.4651" atv="24.0687" 	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_49);" />
 
 					<hotspot name="hsp_50_51"
 			style="hs_anim"
 			url="Animated/ani51.png"
 			animurl="Animated/ani51.png"
-			ath="-135.4931" atv="34.6324" 	 onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
+			ath="-147.9507" atv="9.2782" 	 onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_51);" />
 
 					<hotspot name="hsp_50_52"
 			style="hs_anim"
 			url="Animated/ani52.png"
 			animurl="Animated/ani52.png"
-			ath="-90.8203" atv="22.8150" 	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+			ath="-86.4227" atv="15.0973" 	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_52);" />
 
 					<hotspot name="hsp_50_53"
 			style="hs_anim"
 			url="Animated/ani53.png"
 			animurl="Animated/ani53.png"
-			ath="-107.5681" atv="17.8861" 	 onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
+			ath="-105.0070" atv="11.2241"  	 onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_53);" />
 
 					<hotspot name="hsp_50_54"
 			style="hs_anim"
 			url="Animated/ani54.png"
 			animurl="Animated/ani54.png"
-			ath="-125.8715" atv="13.5394" 	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+			ath="-124.0284" atv="9.3008" 	 onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_50_54);" />
 
 					<hotspot name="hs_article_51"
@@ -4178,7 +4271,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani39.png"
 			animurl="Animated/ani39.png"
-			ath="58.3309" atv="4.3415"   onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
+			ath="58.9290" atv="1.8732"    onclick="loadscene(scene_39,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_39);" />
 
 
@@ -4187,14 +4280,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="65.3693" atv="11.8525"   onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+			ath="69.2100" atv="8.1766"   onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_44);" />
 
 					<hotspot name="hsp_51_45"
 			style="hs_anim"
 			url="Animated/ani45.png"
 			animurl="Animated/ani45.png"
-			ath="50.7847" atv="11.0548"  onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
+			ath="47.0985" atv="4.5878"  onclick="loadscene(scene_45,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_45);" />
 
 
@@ -4202,7 +4295,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani46.png"
 			animurl="Animated/ani46.png"
-			ath="52.4799" atv="7.7399"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
+			ath="49.2057" atv="0.4844"  onclick="loadscene(scene_46,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_46);" />
 
 					<hotspot name="hsp_51_47"
@@ -4224,7 +4317,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani49.png"
 			animurl="Animated/ani49.png"
-			ath="87.7816" atv="25.6779" 	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
+			ath="92.1816" atv="18.4095"	 onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_49);" />
 
 					<hotspot name="hsp_51_50"
@@ -4238,28 +4331,28 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani52.png"
 			animurl="Animated/ani52.png"
-			ath="-21.4511" atv="34.5310"	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+			ath="-14.1514" atv="22.4982"	 onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_52);" />
 
 					<hotspot name="hsp_51_53"
 			style="hs_anim"
 			url="Animated/ani53.png"
 			animurl="Animated/ani53.png"
-			ath="-55.1719" atv="25.7090" onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
+			ath="-50.4075" atv="15.0503" onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_53);" />
 
 					<hotspot name="hsp_51_54"
 			style="hs_anim"
 			url="Animated/ani54.png"
 			animurl="Animated/ani54.png"
-			ath="-82.4276" atv="18.4762"   onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+			ath="-78.6450" atv="13.3381"  onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_54);" />
 
 					<hotspot name="hsp_51_55"
 			style="hs_anim"
 			url="Animated/ani55.png"
 			animurl="Animated/ani55.png"
-			ath="-98.7949" atv="17.4686"   onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
+			ath="-98.9452" atv="12.2190"  onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_51_55);" />
 
 
@@ -4288,8 +4381,7 @@ Apron used for blaudruck (blueprint) work
 
 					<!-- 의상 -->	
 		
-		
-			<hotspot name="hs_gallery_52_2"
+					<hotspot name="hs_gallery_52_2"
 			url="images/Click.png"
 			ath="-125.5664" atv="-5.2056"
 			scale="0.35"
@@ -4302,6 +4394,7 @@ Apron used for blaudruck (blueprint) work
 			
 						);
 					" />
+		
 		
 
 	</scene>
@@ -4322,7 +4415,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani44.png"
 				animurl="Animated/ani44.png"
-				ath="100.7518" atv="11.0021" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+				ath="106.1000" atv="7.6142" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_52_44);" />
 
 
@@ -4337,7 +4430,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani49.png"
 				animurl="Animated/ani49.png"
-				ath="132.9055" atv="17.0265" onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
+				ath="133.0841" atv="12.2011" onclick="loadscene(scene_49,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_52_49);" />
 
 						<hotspot name="hsp_52_50"
@@ -4351,7 +4444,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani51.png"
 				animurl="Animated/ani51.png"
-				ath="-174.0134" atv="32.0116"    onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
+				ath="-169.7096" atv="-3.6450"    onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_52_51);" />
 
 
@@ -4359,7 +4452,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani53.png"
 				animurl="Animated/ani53.png"
-				ath="-57.4479" atv="47.7874"  onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
+				ath="-39.6770" atv="27.4037"   onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_52_53);" />
 
 
@@ -4367,7 +4460,7 @@ Apron used for blaudruck (blueprint) work
 				style="hs_anim"
 				url="Animated/ani54.png"
 				animurl="Animated/ani54.png"
-				ath="-84.0969" atv="23.8546"  onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+				ath="-76.9079" atv="18.4273"  onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 				onloaded="hs_play(hsp_52_54);" />
 
 						<hotspot name="hsp_52_55"
@@ -4408,6 +4501,18 @@ Apron used for blaudruck (blueprint) work
 				distorted="false"
 				handcursor="true"
 				onclick="
+							set_gallery_caps_from_data(cap_g53_2);
+							open_gallery(1,
+							'images/gallery/53_2_1.jpg'
+							);
+						" />
+
+											<hotspot name="hs_gallery_53_2"
+				url="images/Click.png"
+				ath="72.4133" atv="5.2952" scale="0.35"
+				distorted="false"
+				handcursor="true"
+				onclick="
 							set_gallery_caps_from_data(cap_g53_2,cap_g53_2,cap_g53_2);
 							open_gallery(3,
 							'images/gallery/53_2_1.jpg',
@@ -4415,6 +4520,7 @@ Apron used for blaudruck (blueprint) work
 							'images/gallery/53_2_3.jpg'
 							);
 						" />
+		
 		
 
 
@@ -4435,6 +4541,12 @@ Apron used for blaudruck (blueprint) work
 
 
 
+				<hotspot name="hsp_53_5"
+			style="hs_anim"
+			url="Animated/ani5.png"
+			animurl="Animated/ani5.png"
+			ath="-162.3594" atv="12.1718" onclick="loadscene(scene_5,null,MERGE,BLEND(0.5));"
+			onloaded="hs_play(hsp_53_5);" />
 
 					<hotspot name="hsp_53_43"
 			style="hs_anim"
@@ -4447,7 +4559,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="72.0766" atv="11.3698" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
+			ath="76.7024" atv="8.1238" onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_53_44);" />
 
 					<hotspot name="hsp_53_47"
@@ -4476,7 +4588,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani51.png"
 			animurl="Animated/ani51.png"
-			ath="130.1277" atv="33.5789"   onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
+			ath="139.1124" atv="0.3346"   onclick="loadscene(scene_51,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_53_51);" />
 
 
@@ -4484,14 +4596,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani52.png"
 			animurl="Animated/ani52.png"
-			ath="47.5737" atv="42.7742"   onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+			ath="43.1740" atv="29.0617"  onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_53_52);" />
 
 								<hotspot name="hsp_53_54"
 			style="hs_anim"
 			url="Animated/ani54.png"
 			animurl="Animated/ani54.png"
-			ath="-109.2057" atv="32.0194"  onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+			ath="-100.2140" atv="24.4635"   onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_53_54);" />
 
 
@@ -4499,7 +4611,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani55.png"
 			animurl="Animated/ani55.png"
-			ath="-137.5155" atv="23.1565"   onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
+			ath="-135.9377" atv="16.7973"    onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_53_55);" />
 
 
@@ -4553,7 +4665,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani41.png"
 			animurl="Animated/ani41.png"
-			ath="57.7887" atv="5.0328"
+			ath="58.2162" atv="3.3372"
 			onclick="loadscene(scene_41,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_41);" />
 
@@ -4561,7 +4673,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani42.png"
 			animurl="Animated/ani42.png"
-			ath="59.7415" atv="5.8841"
+			ath="60.3756" atv="3.8283"
 			onclick="loadscene(scene_42,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_42);" />
 
@@ -4570,7 +4682,7 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani44.png"
 			animurl="Animated/ani44.png"
-			ath="62.3996" atv="8.2303"
+			ath="66.3102" atv="6.0338"
 			onclick="loadscene(scene_44,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_44);" />
 
@@ -4603,14 +4715,14 @@ Apron used for blaudruck (blueprint) work
 			style="hs_anim"
 			url="Animated/ani52.png"
 			animurl="Animated/ani52.png"
-					ath="46.9959" atv="22.6657" onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+			ath="42.8745" atv="15.1798"  onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_52);" />
 
 					<hotspot name="hsp_54_53"
 			style="hs_anim"
 			url="Animated/ani53.png"
 			animurl="Animated/ani53.png"
-					ath="28.4969" atv="35.4840"
+			ath="10.7034" atv="22.8100" 
 			onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_53);" />
 
@@ -4627,6 +4739,7 @@ Apron used for blaudruck (blueprint) work
 			animurl="Animated/ani56.png"
 			ath="134.8307" atv="27.3864" onclick="loadscene(scene_56,null,MERGE,BLEND(0.5));"
 			onloaded="hs_play(hsp_54_56);" />
+					
 					
 					
 					
@@ -4662,8 +4775,7 @@ Apron used for blaudruck (blueprint) work
 
 
 
-
-				<hotspot name="hsp_55_47"
+		<hotspot name="hsp_55_47"
 		style="hs_anim"
 		url="Animated/ani47.png"
 		animurl="Animated/ani47.png"
@@ -4674,7 +4786,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani52.png"
 		animurl="Animated/ani52.png"
-		ath="34.7718" atv="23.4494"   onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+		ath="32.2400" atv="16.5340"    onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_55_52);" />
 
 
@@ -4690,7 +4802,7 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani54.png"
 		animurl="Animated/ani54.png"
-		ath="-39.2938" atv="41.3200"   onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+		ath="-39.2808" atv="29.7430"   onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_55_54);" />
 
 				<hotspot name="hsp_55_56"
@@ -4699,7 +4811,6 @@ Apron used for blaudruck (blueprint) work
 		animurl="Animated/ani56.png"
 		ath="155.4336" atv="31.0383"   onclick="loadscene(scene_56,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_55_56);" />
-
 
 
 
@@ -4739,29 +4850,30 @@ Apron used for blaudruck (blueprint) work
 		style="hs_anim"
 		url="Animated/ani52.png"
 		animurl="Animated/ani52.png"
-		ath="-6.5193" atv="15.2058"   onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
+		ath="-5.2186" atv="9.9327"   onclick="loadscene(scene_52,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_56_52);" />
 
 				<hotspot name="hsp_56_53"
 		style="hs_anim"
 		url="Animated/ani53.png"
 		animurl="Animated/ani53.png"
-		ath="-19.7640" atv="18.4858"   onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
+		ath="-22.7106" atv="10.7988"    onclick="loadscene(scene_53,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_56_53);" />
 
 				<hotspot name="hsp_56_54"
 		style="hs_anim"
 		url="Animated/ani54.png"
 		animurl="Animated/ani54.png"
-		ath="-43.0869" atv="21.8083" onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
+		ath="-44.7303" atv="14.9019" onclick="loadscene(scene_54,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_56_54);" />
 
 				<hotspot name="hsp_56_55"
 		style="hs_anim"
 		url="Animated/ani55.png"
 		animurl="Animated/ani55.png"
-		ath="-63.0981" atv="31.6553"  onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
+		ath="-70.7485" atv="23.4600"  onclick="loadscene(scene_55,null,MERGE,BLEND(0.5));"
 		onloaded="hs_play(hsp_56_55);" />
+
 
 
 
