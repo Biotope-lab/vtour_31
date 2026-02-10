@@ -1,4 +1,4 @@
-<krpano version="1.22" title="Virtual Tour">
+<krpano version="1.22" title="국립무형유산원-푸름의 대화">
 
 	<include url="skin/vtourskin.xml" />
 
@@ -1752,13 +1752,13 @@ Apron used for blaudruck (blueprint) work
 				<data name="cap_g53_1">
 		<![CDATA[
 <b>내 손에 행복이 ｜ Happiness in my hand </b><br>
-국립무형유산원' 창의공방' 결과물 · 2019 · 누비장 이수자 최재희 <br><br>
+국립무형유산원 '창의공방' 결과물 · 2019 · 누비장 이수자 최재희 <br><br>
 ]]>
 </data>	
 				<data name="cap_g53_2">
 		<![CDATA[
 <b>달(비움, 채움의 시간) ｜ Moon - Time for Emptying and Filling <br>
-국립무형유산원' 창의공방' 결과물 · 2020 · 누비장 이수자 김은주 <br><br>
+국립무형유산원 '창의공방' 결과물 · 2020 · 누비장 이수자 김은주 <br><br>
 
 ]]>
 </data>	
